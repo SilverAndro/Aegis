@@ -4,7 +4,8 @@ import com.mojang.brigadier.arguments.*
 import mc.aegis.AegisCommandBuilder
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
-import net.minecraft.server.command.CommandManager
+import net.minecraft.command.argument.BlockPosArgumentType
+import net.minecraft.command.argument.Vec3ArgumentType
 
 class AegisTestMod : ModInitializer {
     override fun onInitialize() {
@@ -77,6 +78,22 @@ class AegisTestMod : ModInitializer {
                     greedyString("greedyString") {
                         executes {
                             println("Greedy String test: ${StringArgumentType.getString(it, "greedyString")}")
+                            1
+                        }
+                    }
+                }
+                literal("blockPosTest") {
+                    blockPos("blockPos") {
+                        executes {
+                            println("Block Pos test: ${BlockPosArgumentType.getBlockPos(it, "blockPos")}")
+                            1
+                        }
+                    }
+                }
+                literal("vec3Test") {
+                    vec3("vec3") {
+                        executes {
+                            println("Vec3 test: ${Vec3ArgumentType.getVec3(it, "vec3")}")
                             1
                         }
                     }

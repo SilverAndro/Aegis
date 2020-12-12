@@ -7,6 +7,8 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
+import net.minecraft.command.argument.BlockPosArgumentType
+import net.minecraft.command.argument.Vec3ArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import java.util.concurrent.CompletableFuture
@@ -173,6 +175,31 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      */
     fun greedyString(name: String, method: AegisCommandBuilder.()->Unit) {
         runThenAttach(method, CommandManager.argument(name, StringArgumentType.greedyString()))
+    }
+
+    /**
+     * Creates a block pos argument
+     *
+     * Values are retrieved with BlockPosArgumentType.getBlockPos
+     *
+     * @param name the name of the argument
+     * @see BlockPosArgumentType
+     */
+    fun blockPos(name: String, method: AegisCommandBuilder.()->Unit) {
+        runThenAttach(method, CommandManager.argument(name, BlockPosArgumentType.blockPos()))
+    }
+
+    /**
+     * Creates a Vec3 argument
+     *
+     * Values are retrieved with Vec3ArgumentType.getVec3
+     *
+     * @param name the name of the argument
+     * @param centered default true, if position should be centered if specific decimals are not listed
+     * @see Vec3ArgumentType
+     */
+    fun vec3(name: String, centered: Boolean = true, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, Vec3ArgumentType.vec3(centered)))
     }
 
     /**
