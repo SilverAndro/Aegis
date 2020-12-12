@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.*
 import mc.aegis.AegisCommandBuilder
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
+import net.minecraft.server.command.CommandManager
 
 class AegisTestMod : ModInitializer {
     override fun onInitialize() {
@@ -87,6 +88,20 @@ class AegisTestMod : ModInitializer {
                     executes {
                         println("Require test")
                         1
+                    }
+                }
+                literal("suggestsTest") {
+                    string("input") {
+                        suggests { _, builder ->
+                            builder.suggest("...")
+                            builder.suggest(123)
+                            builder.suggest("thisIsSuggestion")
+                            builder.buildFuture()
+                        }
+                        executes {
+                            println("Suggests Test: ${StringArgumentType.getString(it, "input")}")
+                            1
+                        }
                     }
                 }
             }.build())
