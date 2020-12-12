@@ -3,9 +3,13 @@ package mc.aegis
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
+import com.mojang.brigadier.suggestion.Suggestions
+import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
+import java.util.concurrent.CompletableFuture
 
 /**
  * The core builder
@@ -189,5 +193,23 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      */
     fun executes(method: (CommandContext<ServerCommandSource>)->Int) {
         currentNode.executes(method)
+    }
+
+    /**
+     * Adds suggestions to a node
+     *
+     * @param method a lambda that takes in a CommandContext&lt;ServerCommandSource&gt; and a SuggestionBuilder, returning a CompletableFuture&lt;Suggestions&gt;
+     *
+     * @see RequiredArgumentBuilder.suggests
+     */
+    fun suggests(method: (CommandContext<ServerCommandSource>, SuggestionsBuilder) -> CompletableFuture<Suggestions>) {
+        val nodeCopy = currentNode
+        if (nodeCopy is RequiredArgumentBuilder<*, *>) {
+            nodeCopy.suggests { context, builder ->
+                @Suppress("UNCHECKED_CAST")
+                method(context as CommandContext<ServerCommandSource>, builder)
+            }
+        }
+        currentNode = nodeCopy
     }
 }
