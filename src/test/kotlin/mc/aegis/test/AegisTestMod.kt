@@ -12,6 +12,7 @@ import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
 import net.minecraft.command.argument.BlockPosArgumentType
 import net.minecraft.command.argument.Vec3ArgumentType
+import net.minecraft.server.command.CommandManager
 
 class AegisTestMod : ModInitializer {
     override fun onInitialize() {
@@ -128,6 +129,18 @@ class AegisTestMod : ModInitializer {
                     }
                 }
             }.build())
+
+            dispatcher.register(
+                CommandManager.literal("example")
+                    .then(
+                        CommandManager.argument(
+                            "value", IntegerArgumentType.integer(-10, 200)
+                        ).executes {
+                            println(IntegerArgumentType.getInteger(it, "value"))
+                            1
+                        }
+                    )
+            )
         }
     }
 }
