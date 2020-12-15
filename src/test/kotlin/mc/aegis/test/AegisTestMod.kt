@@ -129,18 +129,6 @@ class AegisTestMod : ModInitializer {
                     }
                 }
             }.build())
-
-            dispatcher.register(
-                CommandManager.literal("example")
-                    .then(
-                        CommandManager.argument(
-                            "value", IntegerArgumentType.integer(-10, 200)
-                        ).executes {
-                            println(IntegerArgumentType.getInteger(it, "value"))
-                            1
-                        }
-                    )
-            )
         }
     }
 }
