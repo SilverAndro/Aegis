@@ -4,7 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package mc.aegis
+@file:Suppress("unused")
+
+package com.github.p03w.aegis
 
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.ArgumentBuilder
@@ -14,6 +16,7 @@ import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import net.minecraft.command.argument.BlockPosArgumentType
+import net.minecraft.command.argument.EntityArgumentType
 import net.minecraft.command.argument.Vec3ArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
@@ -91,7 +94,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
     /**
      * Creates an integer argument
      *
-     * Values are retrieved with IntegerArgumentType.getInteger
+     * Values are retrieved with [IntegerArgumentType.getInteger]
      *
      * @param name the name of the argument
      * @param min optional minimum
@@ -105,7 +108,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
     /**
      * Creates a long argument
      *
-     * Values are retrieved with LongArgumentType.getLong
+     * Values are retrieved with [LongArgumentType.getLong]
      *
      * @param name the name of the argument
      * @param min optional minimum
@@ -119,7 +122,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
     /**
      * Creates a float argument
      *
-     * Values are retrieved with FloatArgumentType.getFloat
+     * Values are retrieved with [FloatArgumentType.getFloat]
      *
      * @param name the name of the argument
      * @param min optional minimum
@@ -133,7 +136,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
     /**
      * Creates a double argument
      *
-     * Values are retrieved with DoubleArgumentType.getDouble
+     * Values are retrieved with [DoubleArgumentType.getDouble]
      *
      * @param name the name of the argument
      * @param min optional minimum
@@ -147,7 +150,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
     /**
      * Creates a boolean argument
      *
-     * Values are retrieved with BoolArgumentType.getBool
+     * Values are retrieved with [BoolArgumentType.getBool]
      *
      * @param name the name of the argument
      * @see BoolArgumentType
@@ -159,7 +162,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
     /**
      * Creates a string argument (single word or with quotes)
      *
-     * Values are retrieved with StringArgumentType.getString
+     * Values are retrieved with [StringArgumentType.getString]
      *
      * @param name the name of the argument
      * @see StringArgumentType
@@ -171,7 +174,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
     /**
      * Creates a word argument (single word, no quotes)
      *
-     * Values are retrieved with StringArgumentType.getString
+     * Values are retrieved with [StringArgumentType.getString]
      *
      * @param name the name of the argument
      * @see StringArgumentType
@@ -183,7 +186,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
     /**
      * Creates a greedy string argument (captures ***ALL*** text after previous argument)
      *
-     * Values are retrieved with StringArgumentType.getString
+     * Values are retrieved with [StringArgumentType.getString]
      *
      * @param name the name of the argument
      * @see StringArgumentType
@@ -195,7 +198,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
     /**
      * Creates a block pos argument
      *
-     * Values are retrieved with BlockPosArgumentType.getBlockPos
+     * Values are retrieved with [BlockPosArgumentType.getBlockPos]
      *
      * @param name the name of the argument
      * @see BlockPosArgumentType
@@ -207,7 +210,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
     /**
      * Creates a Vec3 argument
      *
-     * Values are retrieved with Vec3ArgumentType.getVec3
+     * Values are retrieved with [Vec3ArgumentType.getVec3]
      *
      * @param name the name of the argument
      * @param centered default true, if position should be centered if specific decimals are not listed
@@ -215,6 +218,54 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      */
     fun vec3(name: String, centered: Boolean = true, method: AegisCommandBuilder.() -> Unit) {
         runThenAttach(method, CommandManager.argument(name, Vec3ArgumentType.vec3(centered)))
+    }
+
+    /**
+     * Creates a entity argument
+     *
+     * Values are retrieved with [EntityArgumentType.getEntity]
+     *
+     * @param name the name of the argument
+     * @see EntityArgumentType
+     */
+    fun entity(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, EntityArgumentType.entity()))
+    }
+
+    /**
+     * Creates a multiple entity argument
+     *
+     * Values are retrieved with [EntityArgumentType.getEntities]
+     *
+     * @param name the name of the argument
+     * @see EntityArgumentType
+     */
+    fun entities(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, EntityArgumentType.entities()))
+    }
+
+    /**
+     * Creates a player argument
+     *
+     * Values are retrieved with [EntityArgumentType.getEntity]
+     *
+     * @param name the name of the argument
+     * @see EntityArgumentType
+     */
+    fun player(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, EntityArgumentType.player()))
+    }
+
+    /**
+     * Creates a multiple player argument
+     *
+     * Values are retrieved with [EntityArgumentType.getEntities]
+     *
+     * @param name the name of the argument
+     * @see EntityArgumentType
+     */
+    fun players(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, EntityArgumentType.players()))
     }
 
     /**
@@ -230,7 +281,6 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * The final tree argument, executes code in the block when reached
      *
      * @param method a lambda that takes in a CommandContext&lt;ServerCommandSource&gt; and returns an int, with the number showing success count, or 1 for generic success
-     *
      * @see ArgumentBuilder.executes
      */
     fun executes(method: (CommandContext<ServerCommandSource>)->Int) {
@@ -241,7 +291,6 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * Adds suggestions to a node
      *
      * @param method a lambda that takes in a CommandContext&lt;ServerCommandSource&gt; and a SuggestionBuilder, returning a CompletableFuture&lt;Suggestions&gt;
-     *
      * @see RequiredArgumentBuilder.suggests
      */
     fun suggests(method: (CommandContext<ServerCommandSource>, SuggestionsBuilder) -> CompletableFuture<Suggestions>) {
