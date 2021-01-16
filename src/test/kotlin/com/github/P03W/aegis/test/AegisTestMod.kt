@@ -4,15 +4,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package mc.aegis.test
+package com.github.P03W.aegis.test
 
 import com.mojang.brigadier.arguments.*
-import mc.aegis.AegisCommandBuilder
+import com.github.P03W.aegis.AegisCommandBuilder
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
 import net.minecraft.command.argument.BlockPosArgumentType
 import net.minecraft.command.argument.Vec3ArgumentType
-import net.minecraft.server.command.CommandManager
 
 class AegisTestMod : ModInitializer {
     override fun onInitialize() {
