@@ -15,9 +15,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
-import net.minecraft.command.argument.BlockPosArgumentType
-import net.minecraft.command.argument.EntityArgumentType
-import net.minecraft.command.argument.Vec3ArgumentType
+import net.minecraft.command.argument.*
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import java.util.concurrent.CompletableFuture
@@ -266,6 +264,42 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      */
     fun players(name: String, method: AegisCommandBuilder.() -> Unit) {
         runThenAttach(method, CommandManager.argument(name, EntityArgumentType.players()))
+    }
+
+    /**
+     * Creates an angle argument
+     *
+     * Values are retrieved with [AngleArgumentType.getAngle]
+     *
+     * @param name the name of the argument
+     * @see AngleArgumentType
+     */
+    fun angle(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, AngleArgumentType.angle()))
+    }
+
+    /**
+     * Creates a rotation argument
+     *
+     * Values are retrieved with [RotationArgumentType.getRotation]
+     *
+     * @param name the name of the argument
+     * @see RotationArgumentType
+     */
+    fun rotation(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, RotationArgumentType.rotation()))
+    }
+
+    /**
+     * Creates a dimension argument
+     *
+     * Values are retrieved with [DimensionArgumentType.getDimensionArgument]
+     *
+     * @param name the name of the argument
+     * @see DimensionArgumentType
+     */
+    fun dimension(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, DimensionArgumentType.dimension()))
     }
 
     /**
