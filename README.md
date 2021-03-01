@@ -46,7 +46,7 @@ repositories {
 ```
 dependencies {
     // Aegis
-    implementation 'com.github.P03W:Aegis:<VERSION>'
+    modImplementation 'com.github.P03W:Aegis:<VERSION>'
     include 'com.github.P03W:Aegis:<VERSION>'
 }
 ```
