@@ -17,7 +17,7 @@ dispatcher.register(
 )
 ```
 
-Aegis (No imports except for AegisCommandBuilder):
+Aegis:
 ```
 dispatcher.register(
     aegisCommand("example") {
