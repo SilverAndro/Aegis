@@ -19,6 +19,7 @@ import net.minecraft.command.argument.*
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import java.util.concurrent.CompletableFuture
+import java.util.logging.Logger
 
 /**
  * The core builder
@@ -27,8 +28,12 @@ import java.util.concurrent.CompletableFuture
  *
  * @param rootLiteralValue the value of the literal node used as root
  */
-class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.()->Unit) {
-    private var currentNode: ArgumentBuilder<ServerCommandSource, *> = CommandManager.literal(rootLiteralValue)
+class AegisCommandBuilder(val rootLiteralValue: String, method: AegisCommandBuilder.()->Unit) {
+    @PublishedApi
+    internal var currentNode: ArgumentBuilder<ServerCommandSource, *> = CommandManager.literal(rootLiteralValue)
+
+    @PublishedApi
+    internal var chainHasExecute: Boolean = false
 
     init {
         method()
@@ -39,11 +44,17 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      *
      * This is usually recursive, as new nodes call this when being attached
      */
-    private fun runThenAttach(method: AegisCommandBuilder.()->Unit, node: ArgumentBuilder<ServerCommandSource, *>) {
+    @PublishedApi
+    internal inline fun runThenAttach(method: AegisCommandBuilder.()->Unit, node: ArgumentBuilder<ServerCommandSource, *>) {
         val oldNode = currentNode
         currentNode = node
 
+        chainHasExecute = false
         method()
+        if (!chainHasExecute) {
+            Logger.getAnonymousLogger().severe("Command \"$rootLiteralValue\" has a chain that exited without attaching an executes block!")
+            chainHasExecute = true
+        }
 
         currentNode = oldNode
         currentNode.then(node)
@@ -56,6 +67,8 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      *
      * For example, `AegisCommandBuilder("sample") {/* arguments */}.build`
      */
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated("Prefer using the implicit builder for cleaner code")
     fun build(): LiteralArgumentBuilder<ServerCommandSource> {
         return currentNode as LiteralArgumentBuilder<ServerCommandSource>
     }
@@ -66,7 +79,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * This exists to fill in gaps where Aegis doesn't have a replacement.
      * Note there is no way to escape a raw block, once you enter one all code must be raw brigadier
      */
-    fun raw(method: ArgumentBuilder<ServerCommandSource, *>.()->Unit) {
+    inline fun raw(method: ArgumentBuilder<ServerCommandSource, *>.()->Unit) {
         method(currentNode)
     }
 
@@ -75,7 +88,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      *
      * @param argument The custom argument
      */
-    fun custom(argument: ArgumentBuilder<ServerCommandSource, *>, method: AegisCommandBuilder.()->Unit) {
+    inline fun custom(argument: ArgumentBuilder<ServerCommandSource, *>, method: AegisCommandBuilder.()->Unit) {
         runThenAttach(method, argument)
     }
 
@@ -85,7 +98,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param literalValue the value of the literal argument
      * @see CommandManager.literal
      */
-    fun literal(literalValue: String, method: AegisCommandBuilder.()->Unit) {
+    inline fun literal(literalValue: String, method: AegisCommandBuilder.()->Unit) {
         runThenAttach(method, CommandManager.literal(literalValue))
     }
 
@@ -99,7 +112,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param max optional maximum
      * @see IntegerArgumentType
      */
-    fun integer(name: String, min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE, method: AegisCommandBuilder.()->Unit) {
+    inline fun integer(name: String, min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE, method: AegisCommandBuilder.()->Unit) {
         runThenAttach(method, CommandManager.argument(name, IntegerArgumentType.integer(min, max)))
     }
 
@@ -113,7 +126,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param max optional maximum
      * @see LongArgumentType
      */
-    fun long(name: String, min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE, method: AegisCommandBuilder.()->Unit) {
+    inline fun long(name: String, min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE, method: AegisCommandBuilder.()->Unit) {
         runThenAttach(method, CommandManager.argument(name, LongArgumentType.longArg(min, max)))
     }
 
@@ -127,7 +140,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param max optional maximum
      * @see FloatArgumentType
      */
-    fun float(name: String, min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE, method: AegisCommandBuilder.()->Unit) {
+    inline fun float(name: String, min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE, method: AegisCommandBuilder.()->Unit) {
         runThenAttach(method, CommandManager.argument(name, FloatArgumentType.floatArg(min, max)))
     }
 
@@ -141,7 +154,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param max optional maximum
      * @see DoubleArgumentType
      */
-    fun double(name: String, min: Double = Double.MIN_VALUE, max: Double = Double.MAX_VALUE, method: AegisCommandBuilder.()->Unit) {
+    inline fun double(name: String, min: Double = Double.MIN_VALUE, max: Double = Double.MAX_VALUE, method: AegisCommandBuilder.()->Unit) {
         runThenAttach(method, CommandManager.argument(name, DoubleArgumentType.doubleArg(min, max)))
     }
 
@@ -153,7 +166,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param name the name of the argument
      * @see BoolArgumentType
      */
-    fun bool(name: String, method: AegisCommandBuilder.()->Unit) {
+    inline fun bool(name: String, method: AegisCommandBuilder.()->Unit) {
         runThenAttach(method, CommandManager.argument(name, BoolArgumentType.bool()))
     }
 
@@ -165,7 +178,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param name the name of the argument
      * @see StringArgumentType
      */
-    fun string(name: String, method: AegisCommandBuilder.()->Unit) {
+    inline fun string(name: String, method: AegisCommandBuilder.()->Unit) {
         runThenAttach(method, CommandManager.argument(name, StringArgumentType.string()))
     }
 
@@ -177,7 +190,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param name the name of the argument
      * @see StringArgumentType
      */
-    fun word(name: String, method: AegisCommandBuilder.()->Unit) {
+    inline fun word(name: String, method: AegisCommandBuilder.()->Unit) {
         runThenAttach(method, CommandManager.argument(name, StringArgumentType.word()))
     }
 
@@ -189,7 +202,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param name the name of the argument
      * @see StringArgumentType
      */
-    fun greedyString(name: String, method: AegisCommandBuilder.()->Unit) {
+    inline fun greedyString(name: String, method: AegisCommandBuilder.()->Unit) {
         runThenAttach(method, CommandManager.argument(name, StringArgumentType.greedyString()))
     }
 
@@ -201,7 +214,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param name the name of the argument
      * @see BlockPosArgumentType
      */
-    fun blockPos(name: String, method: AegisCommandBuilder.()->Unit) {
+    inline fun blockPos(name: String, method: AegisCommandBuilder.()->Unit) {
         runThenAttach(method, CommandManager.argument(name, BlockPosArgumentType.blockPos()))
     }
 
@@ -214,7 +227,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param centered default true, if position should be centered if specific decimals are not listed
      * @see Vec3ArgumentType
      */
-    fun vec3(name: String, centered: Boolean = true, method: AegisCommandBuilder.() -> Unit) {
+    inline fun vec3(name: String, centered: Boolean = true, method: AegisCommandBuilder.() -> Unit) {
         runThenAttach(method, CommandManager.argument(name, Vec3ArgumentType.vec3(centered)))
     }
 
@@ -226,7 +239,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param name the name of the argument
      * @see EntityArgumentType
      */
-    fun entity(name: String, method: AegisCommandBuilder.() -> Unit) {
+    inline fun entity(name: String, method: AegisCommandBuilder.() -> Unit) {
         runThenAttach(method, CommandManager.argument(name, EntityArgumentType.entity()))
     }
 
@@ -238,7 +251,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param name the name of the argument
      * @see EntityArgumentType
      */
-    fun entities(name: String, method: AegisCommandBuilder.() -> Unit) {
+    inline fun entities(name: String, method: AegisCommandBuilder.() -> Unit) {
         runThenAttach(method, CommandManager.argument(name, EntityArgumentType.entities()))
     }
 
@@ -250,7 +263,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param name the name of the argument
      * @see EntityArgumentType
      */
-    fun player(name: String, method: AegisCommandBuilder.() -> Unit) {
+    inline fun player(name: String, method: AegisCommandBuilder.() -> Unit) {
         runThenAttach(method, CommandManager.argument(name, EntityArgumentType.player()))
     }
 
@@ -262,7 +275,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param name the name of the argument
      * @see EntityArgumentType
      */
-    fun players(name: String, method: AegisCommandBuilder.() -> Unit) {
+    inline fun players(name: String, method: AegisCommandBuilder.() -> Unit) {
         runThenAttach(method, CommandManager.argument(name, EntityArgumentType.players()))
     }
 
@@ -274,7 +287,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param name the name of the argument
      * @see AngleArgumentType
      */
-    fun angle(name: String, method: AegisCommandBuilder.() -> Unit) {
+    inline fun angle(name: String, method: AegisCommandBuilder.() -> Unit) {
         runThenAttach(method, CommandManager.argument(name, AngleArgumentType.angle()))
     }
 
@@ -286,7 +299,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param name the name of the argument
      * @see RotationArgumentType
      */
-    fun rotation(name: String, method: AegisCommandBuilder.() -> Unit) {
+    inline fun rotation(name: String, method: AegisCommandBuilder.() -> Unit) {
         runThenAttach(method, CommandManager.argument(name, RotationArgumentType.rotation()))
     }
 
@@ -298,7 +311,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param name the name of the argument
      * @see DimensionArgumentType
      */
-    fun dimension(name: String, method: AegisCommandBuilder.() -> Unit) {
+    inline fun dimension(name: String, method: AegisCommandBuilder.() -> Unit) {
         runThenAttach(method, CommandManager.argument(name, DimensionArgumentType.dimension()))
     }
 
@@ -317,8 +330,42 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param method a lambda that takes in a CommandContext&lt;ServerCommandSource&gt; and returns an int, with the number showing success count, or 1 for generic success
      * @see ArgumentBuilder.executes
      */
-    fun executes(method: (CommandContext<ServerCommandSource>)->Int) {
-        currentNode.executes(method)
+    fun executesExplicit(debug: Boolean = false, method: (CommandContext<ServerCommandSource>)->Int) {
+        chainHasExecute = true
+        currentNode.executes {
+            try {
+                method(it)
+            } catch (possible: Throwable) {
+                if (debug) {
+                    possible.printStackTrace()
+                }
+                0
+            }
+        }
+    }
+
+    /**
+     * The final tree argument, executes code in the block when reached
+     *
+     * Returns 1 if the code returns without error, 0 otherwise
+     *
+     * @param method a lambda that takes in a CommandContext&lt;ServerCommandSource&gt;
+     * @param debug if the error should print its stack trace on failure
+     * @see ArgumentBuilder.executes
+     */
+    fun executes(debug: Boolean = false, method: (CommandContext<ServerCommandSource>)->Unit) {
+        chainHasExecute = true
+        currentNode.executes {
+            try {
+                method(it)
+                1
+            } catch (possible: Throwable) {
+                if (debug) {
+                    possible.printStackTrace()
+                }
+                0
+            }
+        }
     }
 
     /**
@@ -327,7 +374,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param method a lambda that takes in a CommandContext&lt;ServerCommandSource&gt; and a SuggestionBuilder, returning a CompletableFuture&lt;Suggestions&gt;
      * @see RequiredArgumentBuilder.suggests
      */
-    fun suggests(method: (CommandContext<ServerCommandSource>, SuggestionsBuilder) -> CompletableFuture<Suggestions>) {
+    inline fun suggests(crossinline method: (CommandContext<ServerCommandSource>, SuggestionsBuilder) -> CompletableFuture<Suggestions>) {
         val nodeCopy = currentNode
         if (nodeCopy is RequiredArgumentBuilder<*, *>) {
             nodeCopy.suggests { context, builder ->
@@ -337,4 +384,8 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
         }
         currentNode = nodeCopy
     }
+}
+
+fun aegisCommand(rootLiteralValue: String, method: AegisCommandBuilder.()->Unit): LiteralArgumentBuilder<ServerCommandSource> {
+    return AegisCommandBuilder(rootLiteralValue, method).build()
 }
