@@ -219,6 +219,19 @@ class AegisCommandBuilder(val rootLiteralValue: String, method: AegisCommandBuil
     }
 
     /**
+     * Creates a Vec2 argument
+     *
+     * Values are retrieved with [Vec2ArgumentType.getVec2]
+     *
+     * @param name the name of the argument
+     * @param centered default true, if position should be centered if specific decimals are not listed
+     * @see Vec2ArgumentType
+     */
+    inline fun vec2(name: String, centered: Boolean = true, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, Vec2ArgumentType(centered)))
+    }
+
+    /**
      * Creates a Vec3 argument
      *
      * Values are retrieved with [Vec3ArgumentType.getVec3]
@@ -313,6 +326,30 @@ class AegisCommandBuilder(val rootLiteralValue: String, method: AegisCommandBuil
      */
     inline fun dimension(name: String, method: AegisCommandBuilder.() -> Unit) {
         runThenAttach(method, CommandManager.argument(name, DimensionArgumentType.dimension()))
+    }
+
+    /**
+     * Creates an identifier argument
+     *
+     * Values are retrieved with [IdentifierArgumentType.getIdentifier]
+     *
+     * @param name the name of the argument
+     * @see IdentifierArgumentType
+     */
+    inline fun identifier(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, IdentifierArgumentType.identifier()))
+    }
+
+    /**
+     * Creates a text argument (Similar to string, but can accept json text as well)
+     *
+     * Values are retrieved with [TextArgumentType.getTextArgument]
+     *
+     * @param name the name of the argument
+     * @see TextArgumentType
+     */
+    inline fun text(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, TextArgumentType.text()))
     }
 
     /**
