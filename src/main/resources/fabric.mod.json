@@ -16,8 +16,7 @@
   "license": "MPL-2.0",
 
   "environment": "*",
-  "entrypoints": {
-  },
+  "entrypoints": {},
   "depends": {
     "fabricloader": "*",
     "fabric-language-kotlin": "*",
