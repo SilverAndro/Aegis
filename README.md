@@ -1,5 +1,5 @@
 # Aegis
-Aegis is a DSL/Wrapper around brigadier for kotlin, designed to reduce clutter
+Aegis is a DSL/Wrapper around brigadier for kotlin with fabric, designed to reduce clutter
 
 ---
 Standard kotlin brigadier (with static imports):
@@ -20,14 +20,13 @@ dispatcher.register(
 Aegis (No imports except for AegisCommandBuilder):
 ```
 dispatcher.register(
-    AegisCommandBuilder("example") {
+    aegisCommand("example") {
         integer("value", -10, 200) {
             executes { 
                 println(IntegerArgumentType.getInteger(it, "value"))
-                1
             }
         }
-    }.build()
+    }
 )
  ```
 ---
