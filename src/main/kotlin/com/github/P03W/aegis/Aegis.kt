@@ -93,6 +93,16 @@ class AegisCommandBuilder(val rootLiteralValue: String, method: AegisCommandBuil
     }
 
     /**
+     * Allows for attaching custom arguments to the tree
+     *
+     * @param name the name of the custom argument type
+     * @param argumentType The custom argument type
+     */
+    inline fun custom(name: String, argumentType: ArgumentType<Any>, method: AegisCommandBuilder.()->Unit) {
+        runThenAttach(method, CommandManager.argument(name, argumentType))
+    }
+
+    /**
      * Creates a literal argument
      *
      * @param literalValue the value of the literal argument
