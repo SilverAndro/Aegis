@@ -98,7 +98,7 @@ class AegisCommandBuilder(val rootLiteralValue: String, method: AegisCommandBuil
      * @param name the name of the custom argument type
      * @param argumentType The custom argument type
      */
-    inline fun custom(name: String, argumentType: ArgumentType<Any>, method: AegisCommandBuilder.()->Unit) {
+    inline fun <T : ArgumentType<Any>> custom(name: String, argumentType: T, method: AegisCommandBuilder.()->Unit) {
         runThenAttach(method, CommandManager.argument(name, argumentType))
     }
 
