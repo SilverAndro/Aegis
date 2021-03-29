@@ -398,6 +398,31 @@ class AegisCommandBuilder(val rootLiteralValue: String, method: AegisCommandBuil
         runThenAttach(method, CommandManager.argument(name, SwizzleArgumentType.swizzle()))
     }
 
+
+    /**
+     * Creates an NBT Tag argument
+     *
+     * Values are retrieved with [NbtTagArgumentType.getTag]
+     *
+     * @param name the name of the argument
+     * @see NbtTagArgumentType
+     */
+    inline fun nbtTag(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, NbtTagArgumentType.nbtTag()))
+    }
+
+    /**
+     * Creates an NBT Compound Tag argument
+     *
+     * Values are retrieved with [NbtCompoundTagArgumentType.getCompoundTag]
+     *
+     * @param name the name of the argument
+     * @see NbtCompoundTagArgumentType
+     */
+    inline fun nbtCompoundTag(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, NbtCompoundTagArgumentType.nbtCompound()))
+    }
+
     /**
      * Sets a requirement for the command to be usable
      *
