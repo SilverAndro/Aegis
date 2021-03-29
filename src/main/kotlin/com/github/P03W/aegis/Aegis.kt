@@ -424,6 +424,30 @@ class AegisCommandBuilder(val rootLiteralValue: String, method: AegisCommandBuil
     }
 
     /**
+     * Creates a color argument
+     *
+     * Values are retrieved with [ColorArgumentType.getColor]
+     *
+     * @param name the name of the argument
+     * @see ColorArgumentType
+     */
+    inline fun color(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, ColorArgumentType.color()))
+    }
+
+    /**
+     * Creates a time argument
+     *
+     * Values are retrieved with [IntegerArgumentType.getInteger]
+     *
+     * @param name the name of the argument
+     * @see TimeArgumentType
+     */
+    inline fun time(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, TimeArgumentType.time()))
+    }
+
+    /**
      * Sets a requirement for the command to be usable
      *
      * @see ArgumentBuilder.requires
