@@ -363,6 +363,42 @@ class AegisCommandBuilder(val rootLiteralValue: String, method: AegisCommandBuil
     }
 
     /**
+     * Creates a uuid argument
+     *
+     * Values are retrieved with [UuidArgumentType.getUuid]
+     *
+     * @param name the name of the argument
+     * @see UuidArgumentType
+     */
+    inline fun uuid(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, UuidArgumentType.uuid()))
+    }
+
+    /**
+     * Creates a game profile argument
+     *
+     * Values are retrieved with [GameProfileArgumentType.getProfileArgument]
+     *
+     * @param name the name of the argument
+     * @see GameProfileArgumentType
+     */
+    inline fun gameProfile(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, GameProfileArgumentType.gameProfile()))
+    }
+
+    /**
+     * Creates a swizzle argument
+     *
+     * Values are retrieved with [SwizzleArgumentType.getSwizzle]
+     *
+     * @param name the name of the argument
+     * @see SwizzleArgumentType
+     */
+    inline fun swizzle(name: String, method: AegisCommandBuilder.() -> Unit) {
+        runThenAttach(method, CommandManager.argument(name, SwizzleArgumentType.swizzle()))
+    }
+
+    /**
      * Sets a requirement for the command to be usable
      *
      * @see ArgumentBuilder.requires
