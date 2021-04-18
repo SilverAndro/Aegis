@@ -459,6 +459,7 @@ class AegisCommandBuilder(val rootLiteralValue: String, method: AegisCommandBuil
     /**
      * The final tree argument, executes code in the block when reached
      *
+     * @param debug if the error should print its stack trace on failure (Errors are consumed normally later)
      * @param method a lambda that takes in a CommandContext&lt;ServerCommandSource&gt; and returns an int, with the number showing success count, or 1 for generic success
      * @see ArgumentBuilder.executes
      */
@@ -471,7 +472,7 @@ class AegisCommandBuilder(val rootLiteralValue: String, method: AegisCommandBuil
                 if (debug) {
                     possible.printStackTrace()
                 }
-                0
+                throw possible
             }
         }
     }
@@ -479,10 +480,10 @@ class AegisCommandBuilder(val rootLiteralValue: String, method: AegisCommandBuil
     /**
      * The final tree argument, executes code in the block when reached
      *
-     * Returns 1 if the code returns without error, 0 otherwise
+     * Returns 1 if the code returns without error, re-throws otherwise
      *
+     * @param debug if the error should print its stack trace on failure (Errors are consumed normally later)
      * @param method a lambda that takes in a CommandContext&lt;ServerCommandSource&gt;
-     * @param debug if the error should print its stack trace on failure
      * @see ArgumentBuilder.executes
      */
     fun executes(debug: Boolean = false, method: (CommandContext<ServerCommandSource>)->Unit) {
@@ -495,7 +496,7 @@ class AegisCommandBuilder(val rootLiteralValue: String, method: AegisCommandBuil
                 if (debug) {
                     possible.printStackTrace()
                 }
-                0
+                throw possible
             }
         }
     }
