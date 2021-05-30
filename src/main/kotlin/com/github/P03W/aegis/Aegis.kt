@@ -8,6 +8,7 @@
 
 package com.github.p03w.aegis
 
+import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
@@ -520,5 +521,10 @@ class AegisCommandBuilder(val rootLiteralValue: String, method: AegisCommandBuil
 }
 
 fun aegisCommand(rootLiteralValue: String, method: AegisCommandBuilder.()->Unit): LiteralArgumentBuilder<ServerCommandSource> {
+    @Suppress("DEPRECATION")
     return AegisCommandBuilder(rootLiteralValue, method).build()
+}
+
+fun CommandDispatcher<ServerCommandSource>.register(rootLiteralValue: String, method: AegisCommandBuilder.()->Unit) {
+    register(aegisCommand(rootLiteralValue, method))
 }
