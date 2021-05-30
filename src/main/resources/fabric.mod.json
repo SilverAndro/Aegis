@@ -21,5 +21,10 @@
     "fabricloader": "*",
     "fabric-language-kotlin": "*",
     "minecraft": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [ "library" ]
+    }
   }
 }
