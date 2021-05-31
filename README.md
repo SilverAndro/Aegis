@@ -19,7 +19,7 @@ dispatcher.register(
 
 Aegis:
 ```
-dispatcher.register("example) {
+dispatcher.register("example") {
         integer("value", -10, 200) {
             executes { 
                 println(IntegerArgumentType.getInteger(it, "value"))
