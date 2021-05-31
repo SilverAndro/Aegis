@@ -51,6 +51,12 @@ dependencies {
 
 ---
 
+### Excepted a Boolean return value but found Unit? Whats this about?
+
+This is Aegis' way of enforcing ending chains with executes blocks. Simply properly close out your chain and the error will disappear.
+
+(Note: the `raw` block will also close it out, because its assumed if your using that you known what your using)
+
 ### Implementation notes
 Aegis does not cover every use case (at least, not currently!), however most cases not covered explicitly are covered by the `raw` and `custom` blocks
 
