@@ -10,7 +10,7 @@ dispatcher.register(
             argument(
                 "value", IntegerArgumentType.integer(-10, 200)
             ).executes {
-                println(IntegerArgumentType.getInteger(it, "value"))
+                println(it.getInt("value"))
                 1
             }
         )
@@ -19,8 +19,7 @@ dispatcher.register(
 
 Aegis:
 ```
-dispatcher.register(
-    aegisCommand("example") {
+dispatcher.register("example) {
         integer("value", -10, 200) {
             executes { 
                 println(IntegerArgumentType.getInteger(it, "value"))
