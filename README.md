@@ -20,13 +20,12 @@ dispatcher.register(
 Aegis:
 ```
 dispatcher.register("example") {
-        integer("value", -10, 200) {
-            executes { 
-                println(it.getInt("value"))
-            }
+   integer("value", -10, 200) {
+        executes { 
+            println(it.getInt("value"))
         }
     }
-)
+}
  ```
 ---
 ### Installation (build.gradle)
