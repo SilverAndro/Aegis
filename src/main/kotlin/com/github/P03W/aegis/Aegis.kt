@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-@file:Suppress("unused")
+@file:Suppress("unused", "DEPRECATION")
 
 package com.github.p03w.aegis
 
@@ -16,6 +16,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.command.argument.*
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
@@ -29,6 +30,9 @@ import java.util.concurrent.CompletableFuture
  * @param rootLiteralValue the value of the literal node used as root
  */
 class AegisCommandBuilder(private val rootLiteralValue: String, method: AegisCommandBuilder.()->Unit) {
+    val devEnv = FabricLoader.getInstance().isDevelopmentEnvironment
+
+    @Deprecated("Using this is bad practice, use raw or custom")
     @PublishedApi
     internal var currentNode: ArgumentBuilder<ServerCommandSource, *> = CommandManager.literal(rootLiteralValue)
 
@@ -459,7 +463,7 @@ class AegisCommandBuilder(private val rootLiteralValue: String, method: AegisCom
      * @param method a lambda that takes in a CommandContext&lt;ServerCommandSource&gt; and returns an int, with the number showing success count, or 1 for generic success
      * @see ArgumentBuilder.executes
      */
-    inline fun executesExplicit(debug: Boolean = false, crossinline method: (CommandContext<ServerCommandSource>)->Int): Boolean {
+    inline fun executesExplicit(debug: Boolean = devEnv, crossinline method: (CommandContext<ServerCommandSource>)->Int): Boolean {
         currentNode.executes {
             try {
                 method(it)
@@ -482,7 +486,7 @@ class AegisCommandBuilder(private val rootLiteralValue: String, method: AegisCom
      * @param method a lambda that takes in a CommandContext&lt;ServerCommandSource&gt;
      * @see ArgumentBuilder.executes
      */
-    inline fun executes(debug: Boolean = false, crossinline method: (CommandContext<ServerCommandSource>)->Unit): Boolean {
+    inline fun executes(debug: Boolean = devEnv, crossinline method: (CommandContext<ServerCommandSource>)->Unit): Boolean {
         currentNode.executes {
             try {
                 method(it)
@@ -516,7 +520,6 @@ class AegisCommandBuilder(private val rootLiteralValue: String, method: AegisCom
 }
 
 fun aegisCommand(rootLiteralValue: String, method: AegisCommandBuilder.()->Unit): LiteralArgumentBuilder<ServerCommandSource> {
-    @Suppress("DEPRECATION")
     return AegisCommandBuilder(rootLiteralValue, method).build()
 }
 
