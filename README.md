@@ -1,5 +1,5 @@
 # Aegis
-Aegis is a DSL/Wrapper around brigadier for kotlin with fabric, designed to reduce clutter
+Aegis is a DSL/Wrapper around brigadier for kotlin with fabric, designed to reduce clutter as well as providing utility types
 
 ---
 Standard kotlin brigadier (with static imports):

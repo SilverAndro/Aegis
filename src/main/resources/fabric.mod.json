@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "aegis",
-  "version": "3.0.1",
+  "version": "${version}",
 
   "name": "Aegis",
   "description": "Aegis is a DSL/Wrapper around brigadier for kotlin",
@@ -16,7 +16,11 @@
   "license": "MPL-2.0",
 
   "environment": "*",
-  "entrypoints": {},
+  "entrypoints": {
+    "main": [
+      "com.github.p03w.aegis.internal.AegisInit"
+    ]
+  },
   "depends": {
     "fabricloader": "*",
     "fabric-language-kotlin": "*",
