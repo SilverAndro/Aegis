@@ -8,16 +8,20 @@
 
 package com.github.p03w.aegis
 
+import com.github.p03w.aegis.internal.types.EnumArgument
 import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.context.CommandContext
+import com.mojang.datafixers.util.Either
+import com.mojang.datafixers.util.Pair
 import net.minecraft.command.argument.*
 import net.minecraft.entity.Entity
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.Tag
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.server.function.CommandFunction
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.tag.Tag
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
@@ -26,6 +30,7 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Vec2f
 import net.minecraft.util.math.Vec3d
 import java.util.*
+import kotlin.reflect.KClass
 
 inline fun CommandContext<ServerCommandSource>.getInt(name: String): Int {
     return IntegerArgumentType.getInteger(this, name)
@@ -111,14 +116,26 @@ inline fun CommandContext<ServerCommandSource>.getSwizzle(name: String): EnumSet
     return SwizzleArgumentType.getSwizzle(this, name)
 }
 
-inline fun CommandContext<ServerCommandSource>.getNbtTag(name: String): Tag {
-    return NbtTagArgumentType.getTag(this, name)
-}
-
-inline fun CommandContext<ServerCommandSource>.getNbtCompoundTag(name: String): CompoundTag {
-    return NbtCompoundTagArgumentType.getCompoundTag(this, name)
+inline fun CommandContext<ServerCommandSource>.getNbtCompoundTag(name: String): NbtCompound {
+    return NbtCompoundArgumentType.getNbtCompound(this, name)
 }
 
 inline fun CommandContext<ServerCommandSource>.getColor(name: String): Formatting {
     return ColorArgumentType.getColor(this, name)
+}
+
+inline fun CommandContext<ServerCommandSource>.getOperation(name: String): OperationArgumentType.Operation {
+    return OperationArgumentType.getOperation(this, name)
+}
+
+inline fun CommandContext<ServerCommandSource>.getFunctionsOnly(name: String): MutableCollection<CommandFunction> {
+    return CommandFunctionArgumentType.getFunctions(this, name)
+}
+
+inline fun CommandContext<ServerCommandSource>.getFunctionOrTag(name: String): Pair<Identifier, Either<CommandFunction, Tag<CommandFunction>>> {
+    return CommandFunctionArgumentType.getFunctionOrTag(this, name)
+}
+
+inline fun <reified T: Enum<T>> CommandContext<ServerCommandSource>.getEnum(name: String, enum: KClass<T>): T {
+    return EnumArgument.getEnum(this, name, enum)
 }

@@ -8,6 +8,7 @@
 
 package com.github.p03w.aegis
 
+import com.github.p03w.aegis.internal.types.EnumArgument
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.ArgumentBuilder
@@ -21,6 +22,7 @@ import net.minecraft.command.argument.*
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import java.util.concurrent.CompletableFuture
+import kotlin.reflect.KClass
 
 /**
  * The core builder
@@ -398,29 +400,16 @@ class AegisCommandBuilder(private val rootLiteralValue: String, method: AegisCom
         return runThenAttach(method, CommandManager.argument(name, SwizzleArgumentType.swizzle()))
     }
 
-
     /**
-     * Creates an NBT Tag argument
+     * Creates an NBT Compound argument
      *
-     * Values are retrieved with [NbtTagArgumentType.getTag]
+     * Values are retrieved with [NbtCompoundArgumentType.getNbtCompound]
      *
      * @param name the name of the argument
-     * @see NbtTagArgumentType
+     * @see NbtCompoundArgumentType
      */
-    inline fun nbtTag(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, NbtTagArgumentType.nbtTag()))
-    }
-
-    /**
-     * Creates an NBT Compound Tag argument
-     *
-     * Values are retrieved with [NbtCompoundTagArgumentType.getCompoundTag]
-     *
-     * @param name the name of the argument
-     * @see NbtCompoundTagArgumentType
-     */
-    inline fun nbtCompoundTag(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, NbtCompoundTagArgumentType.nbtCompound()))
+    inline fun nbtCompound(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
+        return runThenAttach(method, CommandManager.argument(name, NbtCompoundArgumentType.nbtCompound()))
     }
 
     /**
@@ -445,6 +434,42 @@ class AegisCommandBuilder(private val rootLiteralValue: String, method: AegisCom
      */
     inline fun time(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
         return runThenAttach(method, CommandManager.argument(name, TimeArgumentType.time()))
+    }
+
+    /**
+     * Creates an operation argument
+     *
+     * Values are retrieved with [OperationArgumentType.getOperation]
+     *
+     * @param name the name of the argument
+     * @see OperationArgumentType
+     */
+    inline fun operation(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
+        return runThenAttach(method, CommandManager.argument(name, OperationArgumentType.operation()))
+    }
+
+    /**
+     * Creates a command function argument
+     *
+     * Values are retrieved with [CommandFunctionArgumentType.getFunctionOrTag]
+     *
+     * @param name the name of the argument
+     * @see CommandFunctionArgumentType
+     */
+    inline fun commandFunction(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
+        return runThenAttach(method, CommandManager.argument(name, CommandFunctionArgumentType.commandFunction()))
+    }
+
+    /**
+     * Creates a time argument
+     *
+     * Values are retrieved with [EnumArgument.getEnum]
+     *
+     * @param name the name of the argument
+     * @see EnumArgument
+     */
+    inline fun <T : Enum<T>> enum(name: String, enum: KClass<T>, method: AegisCommandBuilder.() -> Boolean): Boolean {
+        return runThenAttach(method, CommandManager.argument(name, EnumArgument(enum.java)))
     }
 
     /**
