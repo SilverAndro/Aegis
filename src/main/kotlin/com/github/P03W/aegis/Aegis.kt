@@ -461,7 +461,7 @@ class AegisCommandBuilder(private val rootLiteralValue: String, method: AegisCom
     }
 
     /**
-     * Creates a time argument
+     * Creates an enum argument
      *
      * Values are retrieved with [EnumArgument.getEnum]
      *
