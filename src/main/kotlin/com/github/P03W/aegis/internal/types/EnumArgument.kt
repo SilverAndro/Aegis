@@ -20,12 +20,17 @@ import net.minecraft.text.LiteralText
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
-class EnumArgument<T : Enum<T>>(val enumClass: Class<T>, val lowercase: Boolean) : ArgumentType<T> {
+class EnumArgument<T : Enum<T>>(val enumClass: Class<T>, val format: FormatType) : ArgumentType<T> {
     private val values: HashMap<String, T> = hashMapOf()
 
     init {
         enumClass.enumConstants.forEach {
-            values[if (lowercase) it.name.lowercase() else it.name] = it
+            val name = when (format) {
+                FormatType.LEAVE -> it.name
+                FormatType.ALL_LOWER -> it.name.lowercase()
+                FormatType.FIRST_LOWER -> it.name.replaceFirstChar { char -> char.lowercase() }
+            }
+            values[name] = it
         }
     }
 
@@ -45,16 +50,16 @@ class EnumArgument<T : Enum<T>>(val enumClass: Class<T>, val lowercase: Boolean)
     internal class Serializer : ArgumentSerializer<EnumArgument<*>> {
         override fun toPacket(enumArgument: EnumArgument<*>, packetByteBuf: PacketByteBuf) {
             packetByteBuf.writeString(enumArgument.enumClass.name, MAX_LENGTH)
-            packetByteBuf.writeBoolean(enumArgument.lowercase)
+            packetByteBuf.writeVarInt(enumArgument.format.ordinal)
         }
 
         override fun fromPacket(packetByteBuf: PacketByteBuf): EnumArgument<*> {
             val className = packetByteBuf.readString(MAX_LENGTH)
-            val lowercase = packetByteBuf.readBoolean()
+            val format = FormatType.values()[packetByteBuf.readVarInt()]
 
             val value = Class.forName(className)
             require(value.isEnum) { "Class $value is not an enum!" }
-            return EnumArgument(value.asSubclass(Enum::class.java), lowercase)
+            return EnumArgument(value.asSubclass(Enum::class.java), format)
         }
 
         override fun toJson(argumentType: EnumArgument<*>, jsonObject: JsonObject) {
@@ -72,5 +77,11 @@ class EnumArgument<T : Enum<T>>(val enumClass: Class<T>, val lowercase: Boolean)
         fun <T: Enum<T>> getEnum(ctx: CommandContext<*>, argKey: String, enumClazz: KClass<T>): T {
             return ctx.getArgument(argKey, enumClazz.java)
         }
+    }
+
+    enum class FormatType {
+        LEAVE,
+        ALL_LOWER,
+        FIRST_LOWER
     }
 }
