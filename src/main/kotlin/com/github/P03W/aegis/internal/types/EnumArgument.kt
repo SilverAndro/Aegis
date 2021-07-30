@@ -20,13 +20,12 @@ import net.minecraft.text.LiteralText
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
-class EnumArgument<T : Enum<T>>(val enumClass: Class<T>) : ArgumentType<T> {
+class EnumArgument<T : Enum<T>>(val enumClass: Class<T>, val lowercase: Boolean) : ArgumentType<T> {
     private val values: HashMap<String, T> = hashMapOf()
 
     init {
         enumClass.enumConstants.forEach {
-            val cleanName = it.name
-            values[cleanName] = it
+            values[if (lowercase) it.name.lowercase() else it.name] = it
         }
     }
 
@@ -35,10 +34,7 @@ class EnumArgument<T : Enum<T>>(val enumClass: Class<T>) : ArgumentType<T> {
         return values[name] ?: throw illegalEnumValue.createWithContext(reader, name, enumClass)
     }
 
-    override fun <S> listSuggestions(
-        context: CommandContext<S>,
-        builder: SuggestionsBuilder
-    ): CompletableFuture<Suggestions> {
+    override fun <S> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
         return CommandSource.suggestMatching(values.keys, builder)
     }
 
@@ -47,23 +43,22 @@ class EnumArgument<T : Enum<T>>(val enumClass: Class<T>) : ArgumentType<T> {
     }
 
     internal class Serializer : ArgumentSerializer<EnumArgument<*>> {
-        override fun toPacket(argumentType: EnumArgument<*>, packetByteBuf: PacketByteBuf) {
-            packetByteBuf.writeString(argumentType.enumClass.name, MAX_LENGTH)
+        override fun toPacket(enumArgument: EnumArgument<*>, packetByteBuf: PacketByteBuf) {
+            packetByteBuf.writeString(enumArgument.enumClass.name, MAX_LENGTH)
+            packetByteBuf.writeBoolean(enumArgument.lowercase)
         }
 
         override fun fromPacket(packetByteBuf: PacketByteBuf): EnumArgument<*> {
             val className = packetByteBuf.readString(MAX_LENGTH)
+            val lowercase = packetByteBuf.readBoolean()
+
             val value = Class.forName(className)
             require(value.isEnum) { "Class $value is not an enum!" }
-            return EnumArgument(value.asSubclass(Enum::class.java))
+            return EnumArgument(value.asSubclass(Enum::class.java), lowercase)
         }
 
         override fun toJson(argumentType: EnumArgument<*>, jsonObject: JsonObject) {
             jsonObject.addProperty("enum", argumentType.enumClass.name)
-        }
-
-        companion object {
-            const val MAX_LENGTH = 128 * 4
         }
     }
 
@@ -71,6 +66,8 @@ class EnumArgument<T : Enum<T>>(val enumClass: Class<T>) : ArgumentType<T> {
         val illegalEnumValue = Dynamic2CommandExceptionType { value: Any, `class`: Any ->
             LiteralText("Unknown enum '$value' in ${(`class` as Class<*>).simpleName}")
         }
+
+        const val MAX_LENGTH = 128 * 2
 
         fun <T: Enum<T>> getEnum(ctx: CommandContext<*>, argKey: String, enumClazz: KClass<T>): T {
             return ctx.getArgument(argKey, enumClazz.java)
