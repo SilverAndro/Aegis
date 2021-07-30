@@ -468,8 +468,8 @@ class AegisCommandBuilder(private val rootLiteralValue: String, method: AegisCom
      * @param name the name of the argument
      * @see EnumArgument
      */
-    inline fun <T : Enum<T>> enum(name: String, enum: KClass<T>, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, EnumArgument(enum.java)))
+    inline fun <T : Enum<T>> enum(name: String, enum: KClass<T>, lowercase: Boolean = false, method: AegisCommandBuilder.() -> Boolean): Boolean {
+        return runThenAttach(method, CommandManager.argument(name, EnumArgument(enum.java, lowercase)))
     }
 
     /**
