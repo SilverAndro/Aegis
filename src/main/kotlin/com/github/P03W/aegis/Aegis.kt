@@ -466,10 +466,12 @@ class AegisCommandBuilder(private val rootLiteralValue: String, method: AegisCom
      * Values are retrieved with [EnumArgument.getEnum]
      *
      * @param name the name of the argument
+     * @param enum the enum of the argument
+     * @param format how to format the enum names, defaults to how it is in source code
      * @see EnumArgument
      */
-    inline fun <T : Enum<T>> enum(name: String, enum: KClass<T>, lowercase: Boolean = false, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, EnumArgument(enum.java, lowercase)))
+    inline fun <T : Enum<T>> enum(name: String, enum: KClass<T>, format: EnumArgument.FormatType = EnumArgument.FormatType.LEAVE, method: AegisCommandBuilder.() -> Boolean): Boolean {
+        return runThenAttach(method, CommandManager.argument(name, EnumArgument(enum.java, format)))
     }
 
     /**
