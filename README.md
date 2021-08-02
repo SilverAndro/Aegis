@@ -30,21 +30,19 @@ dispatcher.register("example") {
 ---
 ### Installation (build.gradle)
 
-Latest version: [![](https://jitpack.io/v/P03W/Aegis.svg)](https://jitpack.io/#P03W/Aegis)
+Latest version: ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/P03W/Aegis?label=Latest%20Release)
 
 ```
 repositories {
-    maven {
-        url 'https://jitpack.io'
-    }
+    maven { url = "https://api.modrinth.com/maven" }
 }
 ```
 
 ```
 dependencies {
     // Aegis
-    modImplementation 'com.github.P03W:Aegis:<VERSION>'
-    include 'com.github.P03W:Aegis:<VERSION>'
+    modImplementation "maven.modrinth:aegis:<VERSION>"
+    include "maven.modrinth:aegis:<VERSION>"
 }
 ```
 

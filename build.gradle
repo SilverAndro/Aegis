@@ -15,7 +15,6 @@ group = project.maven_group
 minecraft {
 }
 
-
 // Licenser
 license {
     header = rootProject.file('LICENSE_FILE_HEADER')
