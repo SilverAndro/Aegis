@@ -137,5 +137,5 @@ inline fun CommandContext<ServerCommandSource>.getFunctionOrTag(name: String): P
 }
 
 inline fun <reified T: Enum<T>> CommandContext<ServerCommandSource>.getEnum(name: String, enum: KClass<T>): T {
-    return EnumArgument.getEnum(this, name, enum)
+    return this.getArgument(name, enum.java)
 }

@@ -1,3 +1,13 @@
+//file:noinspection GroovyAssignabilityCheck
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.guardsquare:proguard-gradle:7.1.0'
+    }
+}
+
 plugins {
     id 'fabric-loom'
     id 'maven-publish'
@@ -17,7 +27,7 @@ minecraft {
 
 // Licenser
 license {
-    header = rootProject.file('LICENSE_FILE_HEADER')
+    header = rootProject.file('LICENSE')
     include '**/*.java'
     include '**/*.kt'
     style.java = 'BLOCK_COMMENT'
@@ -62,6 +72,7 @@ tasks.withType(JavaCompile) {
 // if it is present.
 // If you remove this task, sources will not be generated.
 task sourcesJar(type: Jar, dependsOn: classes) {
+    //noinspection GrDeprecatedAPIUsage
     classifier = "sources"
     from sourceSets.main.allSource
 }
@@ -91,4 +102,27 @@ publishing {
     }
 }
 
-compileKotlin.kotlinOptions.jvmTarget = "1.8"
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs += [
+                "-Xno-call-assertions",
+                "-Xno-receiver-assertions",
+                "-Xno-param-assertions",
+                "-Xopt-in=kotlin.RequiresOptIn"
+        ]
+    }
+}
+
+//noinspection UnnecessaryQualifiedReference
+task generateRuntimeLib(type: proguard.gradle.ProGuardTask, dependsOn: build) {
+    configuration("config/proguard.pro")
+
+    injars(file("build/libs/aegis-"+version+".jar"))
+    outjars(file("build/libs/aegis-runtime-"+version+".jar"))
+}
+
+configure(generateRuntimeLib) {
+    group = "build"
+    description = "Proguard the output JAR for runtime"
+}
