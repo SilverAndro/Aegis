@@ -23,6 +23,10 @@ import kotlin.reflect.KClass
 class EnumArgument<T : Enum<T>>(val enumClass: Class<T>, val format: FormatType) : ArgumentType<T> {
     private val values: HashMap<String, T> = hashMapOf()
 
+    private val illegalEnumValue = Dynamic2CommandExceptionType { value: Any, `class`: Any ->
+        LiteralText("Unknown enum '$value' in ${(`class` as Class<*>).simpleName}")
+    }
+
     init {
         enumClass.enumConstants.forEach {
             val name = when (format) {
@@ -49,12 +53,12 @@ class EnumArgument<T : Enum<T>>(val enumClass: Class<T>, val format: FormatType)
 
     internal class Serializer : ArgumentSerializer<EnumArgument<*>> {
         override fun toPacket(enumArgument: EnumArgument<*>, packetByteBuf: PacketByteBuf) {
-            packetByteBuf.writeString(enumArgument.enumClass.name, MAX_LENGTH)
+            packetByteBuf.writeString(enumArgument.enumClass.name, 256)
             packetByteBuf.writeVarInt(enumArgument.format.ordinal)
         }
 
         override fun fromPacket(packetByteBuf: PacketByteBuf): EnumArgument<*> {
-            val className = packetByteBuf.readString(MAX_LENGTH)
+            val className = packetByteBuf.readString(256)
             val format = FormatType.values()[packetByteBuf.readVarInt()]
 
             val value = Class.forName(className)
@@ -68,12 +72,6 @@ class EnumArgument<T : Enum<T>>(val enumClass: Class<T>, val format: FormatType)
     }
 
     companion object {
-        val illegalEnumValue = Dynamic2CommandExceptionType { value: Any, `class`: Any ->
-            LiteralText("Unknown enum '$value' in ${(`class` as Class<*>).simpleName}")
-        }
-
-        const val MAX_LENGTH = 128 * 2
-
         fun <T: Enum<T>> getEnum(ctx: CommandContext<*>, argKey: String, enumClazz: KClass<T>): T {
             return ctx.getArgument(argKey, enumClazz.java)
         }

@@ -31,7 +31,7 @@ import kotlin.reflect.KClass
  *
  * @param rootLiteralValue the value of the literal node used as root
  */
-class AegisCommandBuilder(private val rootLiteralValue: String, method: AegisCommandBuilder.()->Unit) {
+class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.()->Unit) {
     val devEnv = FabricLoader.getInstance().isDevelopmentEnvironment
 
     @Deprecated("Using this is bad practice, use raw or custom")
