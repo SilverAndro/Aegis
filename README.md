@@ -46,6 +46,18 @@ dependencies {
 }
 ```
 
+Note: If you care about file size you can `include` the runtime instead, a stripped down jar with only the bare minimum required to run against with
+```
+include ("maven.modrinth:aegis:<VERSION>") {
+        artifact {
+            name = 'aegis-runtime'
+            extension = 'jar'
+            type = 'jar'
+            url = "https://api.modrinth.com/maven/maven/modrinth/aegis/<VERSION>/aegis-runtime-<VERSION>.jar"
+        }
+    }
+```
+
 ---
 
 ### Implementation notes
