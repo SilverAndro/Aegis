@@ -51,7 +51,7 @@ class EnumArgument<T : Enum<T>>(val enumClass: Class<T>, val format: FormatType)
         return values.keys
     }
 
-    internal class Serializer : ArgumentSerializer<EnumArgument<*>> {
+    object Serializer : ArgumentSerializer<EnumArgument<*>> {
         override fun toPacket(enumArgument: EnumArgument<*>, packetByteBuf: PacketByteBuf) {
             packetByteBuf.writeString(enumArgument.enumClass.name, 256)
             packetByteBuf.writeVarInt(enumArgument.format.ordinal)

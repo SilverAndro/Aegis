@@ -20,9 +20,16 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.command.argument.*
 import net.minecraft.server.command.CommandManager
+import net.minecraft.server.command.CommandManager.argument
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.util.Identifier
+import net.minecraft.util.math.BlockPos
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
+import kotlin.reflect.KParameter
+import kotlin.reflect.full.createType
+import kotlin.reflect.full.primaryConstructor
 
 /**
  * The core builder
@@ -101,7 +108,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @param argumentType The custom argument type
      */
     inline fun <T : ArgumentType<*>> custom(name: String, argumentType: T, method: AegisCommandBuilder.()->Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, argumentType))
+        return runThenAttach(method, argument(name, argumentType))
     }
 
     /**
@@ -125,7 +132,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see IntegerArgumentType
      */
     inline fun integer(name: String, min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE, method: AegisCommandBuilder.()->Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, IntegerArgumentType.integer(min, max)))
+        return runThenAttach(method, argument(name, IntegerArgumentType.integer(min, max)))
     }
 
     /**
@@ -139,7 +146,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see LongArgumentType
      */
     inline fun long(name: String, min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE, method: AegisCommandBuilder.()->Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, LongArgumentType.longArg(min, max)))
+        return runThenAttach(method, argument(name, LongArgumentType.longArg(min, max)))
     }
 
     /**
@@ -153,7 +160,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see FloatArgumentType
      */
     inline fun float(name: String, min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE, method: AegisCommandBuilder.()->Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, FloatArgumentType.floatArg(min, max)))
+        return runThenAttach(method, argument(name, FloatArgumentType.floatArg(min, max)))
     }
 
     /**
@@ -167,7 +174,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see DoubleArgumentType
      */
     inline fun double(name: String, min: Double = Double.MIN_VALUE, max: Double = Double.MAX_VALUE, method: AegisCommandBuilder.()->Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, DoubleArgumentType.doubleArg(min, max)))
+        return runThenAttach(method, argument(name, DoubleArgumentType.doubleArg(min, max)))
     }
 
     /**
@@ -179,7 +186,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see BoolArgumentType
      */
     inline fun bool(name: String, method: AegisCommandBuilder.()->Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, BoolArgumentType.bool()))
+        return runThenAttach(method, argument(name, BoolArgumentType.bool()))
     }
 
     /**
@@ -191,7 +198,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see StringArgumentType
      */
     inline fun string(name: String, method: AegisCommandBuilder.()->Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, StringArgumentType.string()))
+        return runThenAttach(method, argument(name, StringArgumentType.string()))
     }
 
     /**
@@ -203,7 +210,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see StringArgumentType
      */
     inline fun word(name: String, method: AegisCommandBuilder.()->Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, StringArgumentType.word()))
+        return runThenAttach(method, argument(name, StringArgumentType.word()))
     }
 
     /**
@@ -215,7 +222,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see StringArgumentType
      */
     inline fun greedyString(name: String, method: AegisCommandBuilder.()->Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, StringArgumentType.greedyString()))
+        return runThenAttach(method, argument(name, StringArgumentType.greedyString()))
     }
 
     /**
@@ -227,7 +234,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see BlockPosArgumentType
      */
     inline fun blockPos(name: String, method: AegisCommandBuilder.()->Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, BlockPosArgumentType.blockPos()))
+        return runThenAttach(method, argument(name, BlockPosArgumentType.blockPos()))
     }
 
     /**
@@ -240,7 +247,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see Vec2ArgumentType
      */
     inline fun vec2(name: String, centered: Boolean = true, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, Vec2ArgumentType(centered)))
+        return runThenAttach(method, argument(name, Vec2ArgumentType(centered)))
     }
 
     /**
@@ -253,7 +260,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see Vec3ArgumentType
      */
     inline fun vec3(name: String, centered: Boolean = true, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, Vec3ArgumentType.vec3(centered)))
+        return runThenAttach(method, argument(name, Vec3ArgumentType.vec3(centered)))
     }
 
     /**
@@ -265,7 +272,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see EntityArgumentType
      */
     inline fun entity(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, EntityArgumentType.entity()))
+        return runThenAttach(method, argument(name, EntityArgumentType.entity()))
     }
 
     /**
@@ -277,7 +284,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see EntityArgumentType
      */
     inline fun entities(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, EntityArgumentType.entities()))
+        return runThenAttach(method, argument(name, EntityArgumentType.entities()))
     }
 
     /**
@@ -289,7 +296,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see EntityArgumentType
      */
     inline fun player(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, EntityArgumentType.player()))
+        return runThenAttach(method, argument(name, EntityArgumentType.player()))
     }
 
     /**
@@ -301,7 +308,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see EntityArgumentType
      */
     inline fun players(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, EntityArgumentType.players()))
+        return runThenAttach(method, argument(name, EntityArgumentType.players()))
     }
 
     /**
@@ -313,7 +320,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see AngleArgumentType
      */
     inline fun angle(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, AngleArgumentType.angle()))
+        return runThenAttach(method, argument(name, AngleArgumentType.angle()))
     }
 
     /**
@@ -325,7 +332,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see RotationArgumentType
      */
     inline fun rotation(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, RotationArgumentType.rotation()))
+        return runThenAttach(method, argument(name, RotationArgumentType.rotation()))
     }
 
     /**
@@ -337,7 +344,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see DimensionArgumentType
      */
     inline fun dimension(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, DimensionArgumentType.dimension()))
+        return runThenAttach(method, argument(name, DimensionArgumentType.dimension()))
     }
 
     /**
@@ -349,7 +356,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see IdentifierArgumentType
      */
     inline fun identifier(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, IdentifierArgumentType.identifier()))
+        return runThenAttach(method, argument(name, IdentifierArgumentType.identifier()))
     }
 
     /**
@@ -361,7 +368,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see TextArgumentType
      */
     inline fun text(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, TextArgumentType.text()))
+        return runThenAttach(method, argument(name, TextArgumentType.text()))
     }
 
     /**
@@ -373,7 +380,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see UuidArgumentType
      */
     inline fun uuid(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, UuidArgumentType.uuid()))
+        return runThenAttach(method, argument(name, UuidArgumentType.uuid()))
     }
 
     /**
@@ -385,7 +392,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see GameProfileArgumentType
      */
     inline fun gameProfile(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, GameProfileArgumentType.gameProfile()))
+        return runThenAttach(method, argument(name, GameProfileArgumentType.gameProfile()))
     }
 
     /**
@@ -397,7 +404,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see SwizzleArgumentType
      */
     inline fun swizzle(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, SwizzleArgumentType.swizzle()))
+        return runThenAttach(method, argument(name, SwizzleArgumentType.swizzle()))
     }
 
     /**
@@ -409,7 +416,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see NbtCompoundArgumentType
      */
     inline fun nbtCompound(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, NbtCompoundArgumentType.nbtCompound()))
+        return runThenAttach(method, argument(name, NbtCompoundArgumentType.nbtCompound()))
     }
 
     /**
@@ -421,7 +428,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see ColorArgumentType
      */
     inline fun color(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, ColorArgumentType.color()))
+        return runThenAttach(method, argument(name, ColorArgumentType.color()))
     }
 
     /**
@@ -433,7 +440,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see TimeArgumentType
      */
     inline fun time(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, TimeArgumentType.time()))
+        return runThenAttach(method, argument(name, TimeArgumentType.time()))
     }
 
     /**
@@ -445,7 +452,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see OperationArgumentType
      */
     inline fun operation(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, OperationArgumentType.operation()))
+        return runThenAttach(method, argument(name, OperationArgumentType.operation()))
     }
 
     /**
@@ -457,7 +464,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see CommandFunctionArgumentType
      */
     inline fun commandFunction(name: String, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, CommandFunctionArgumentType.commandFunction()))
+        return runThenAttach(method, argument(name, CommandFunctionArgumentType.commandFunction()))
     }
 
     /**
@@ -471,7 +478,41 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      * @see EnumArgument
      */
     inline fun <T : Enum<T>> enum(name: String, enum: KClass<T>, format: EnumArgument.FormatType = EnumArgument.FormatType.LEAVE, method: AegisCommandBuilder.() -> Boolean): Boolean {
-        return runThenAttach(method, CommandManager.argument(name, EnumArgument(enum.java, format)))
+        return runThenAttach(method, argument(name, EnumArgument(enum.java, format)))
+    }
+
+    /**
+     * Internal function used to manage the logic for attaching parameters from [data] to the tree
+     */
+    private fun attachParams(name: String, list: List<KParameter>, index: Int, method: AegisCommandBuilder.() -> Boolean): Boolean {
+        val param = list[index]
+        val paramName = "$name-${param.name}"
+        val next = when (param.type) {
+            String::class.createType() -> argument(paramName, StringArgumentType.string())
+            Int::class.createType() -> argument(paramName, IntegerArgumentType.integer())
+            Long::class.createType() -> argument(paramName, LongArgumentType.longArg())
+            Float::class.createType() -> argument(paramName, FloatArgumentType.floatArg())
+            Double::class.createType() -> argument(paramName, DoubleArgumentType.doubleArg())
+            Boolean::class.createType() -> argument(paramName, BoolArgumentType.bool())
+            UUID::class.createType() -> argument(paramName, UuidArgumentType.uuid())
+            Identifier::class.createType() -> argument(paramName, IdentifierArgumentType.identifier())
+            BlockPos::class.createType() -> argument(paramName, BlockPosArgumentType.blockPos())
+            else -> throw IllegalArgumentException("Don't know how to handle parameter ${param.name} which is of type ${param.type}")
+        }
+        return runThenAttach({ if (index < list.lastIndex) attachParams(name, list, index + 1, method) else method()}, next)
+    }
+
+    /**
+     * Creates an argument that will return a string in the set with restrictions based on [filter]
+     *
+     * Values are retrieved with [getData]
+     *
+     * @param name the name of the argument
+     * @param clazz the data class for the argument
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun data(name: String, clazz: KClass<*>, method: AegisCommandBuilder.() -> Boolean): Boolean {
+        return attachParams(name, clazz.primaryConstructor!!.parameters, 0, method)
     }
 
     /**

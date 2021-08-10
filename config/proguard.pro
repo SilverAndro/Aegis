@@ -34,6 +34,8 @@
     public ** build();
     private *;
     public *** requires(...);
+
+    public *** data(...);
 }
 
 -keep class ca.stallardrift.colonel.**

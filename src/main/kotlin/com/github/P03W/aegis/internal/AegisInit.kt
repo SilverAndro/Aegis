@@ -16,7 +16,7 @@ class AegisInit : ModInitializer {
     override fun onInitialize() {
         ServerArgumentType.builder<EnumArgument<*>>(Identifier("aegis", "enum"))
             .type(EnumArgument::class.java)
-            .serializer(EnumArgument.Serializer())
+            .serializer(EnumArgument.Serializer)
             .fallbackProvider { StringArgumentType.word() }
             .register()
     }
