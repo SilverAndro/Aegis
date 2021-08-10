@@ -486,7 +486,8 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      */
     private fun attachParams(name: String, list: List<KParameter>, index: Int, method: AegisCommandBuilder.() -> Boolean): Boolean {
         val param = list[index]
-        val paramName = "$name-${param.name}"
+        val typeName = param.type.toString().split(".").last()
+        val paramName = "$name.${param.name}: $typeName"
         val next = when (param.type) {
             String::class.createType() -> argument(paramName, StringArgumentType.string())
             Int::class.createType() -> argument(paramName, IntegerArgumentType.integer())

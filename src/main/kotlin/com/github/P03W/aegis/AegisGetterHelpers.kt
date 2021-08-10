@@ -32,6 +32,8 @@ import net.minecraft.util.math.Vec3d
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.javaType
+import kotlin.reflect.jvm.javaType
 
 inline fun CommandContext<ServerCommandSource>.getInt(name: String): Int {
     return IntegerArgumentType.getInteger(this, name)
@@ -144,12 +146,8 @@ inline fun <reified T: Enum<T>> CommandContext<ServerCommandSource>.getEnum(name
 inline fun <reified T: Any> CommandContext<ServerCommandSource>.getData(name: String, clazz: KClass<T>): T {
     val params: MutableList<Any> = mutableListOf()
     clazz.primaryConstructor!!.parameters.forEach {
-        try {
-            params.add(this.getArgument("$name-${it.name}", Any::class.java))
-        } catch (err: IllegalArgumentException) {
-            err.printStackTrace()
-            throw err
-        }
+        val typeName = it.type.toString().split(".").last()
+        params.add(this.getArgument("$name.${it.name}: $typeName", Any::class.java))
     }
     return clazz.primaryConstructor!!.call(*params.toTypedArray())
 }
