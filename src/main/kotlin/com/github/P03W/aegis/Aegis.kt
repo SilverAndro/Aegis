@@ -4,11 +4,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-@file:Suppress("unused", "DEPRECATION")
+@file:Suppress("unused", "DEPRECATION", "MemberVisibilityCanBePrivate")
 
 package com.github.p03w.aegis
 
 import com.github.p03w.aegis.internal.types.EnumArgument
+import com.mojang.authlib.GameProfile
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.ArgumentBuilder
@@ -498,6 +499,7 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
             UUID::class.createType() -> argument(paramName, UuidArgumentType.uuid())
             Identifier::class.createType() -> argument(paramName, IdentifierArgumentType.identifier())
             BlockPos::class.createType() -> argument(paramName, BlockPosArgumentType.blockPos())
+            GameProfile::class.createType() -> argument(paramName, GameProfileArgumentType.gameProfile())
             else -> throw IllegalArgumentException("Don't know how to handle parameter ${param.name} which is of type ${param.type}")
         }
         return runThenAttach({ if (index < list.lastIndex) attachParams(name, list, index + 1, method) else method()}, next)
@@ -508,10 +510,23 @@ class AegisCommandBuilder(rootLiteralValue: String, method: AegisCommandBuilder.
      *
      * Values are retrieved with [getData]
      *
+     * Behavior with [requires] is ***not explicitly supported*** and may not result in expected results
+     *
+     * Supported param types:
+     *  - String
+     *  - Int
+     *  - Long
+     *  - Float
+     *  - Double
+     *  - Boolean
+     *  - UUID
+     *  - Identifier
+     *  - BlockPos
+     *  - GameProfile
+     *
      * @param name the name of the argument
      * @param clazz the data class for the argument
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun data(name: String, clazz: KClass<*>, method: AegisCommandBuilder.() -> Boolean): Boolean {
         return attachParams(name, clazz.primaryConstructor!!.parameters, 0, method)
     }
