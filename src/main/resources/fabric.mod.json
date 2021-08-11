@@ -10,7 +10,8 @@
   ],
   "contact": {
     "homepage": "https://github.com/P03W/Aegis",
-    "sources": "https://github.com/P03W/Aegis"
+    "sources": "https://github.com/P03W/Aegis",
+    "issues": "https://github.com/P03W/Aegis/issues"
   },
 
   "license": "MPL-2.0",
