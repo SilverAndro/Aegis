@@ -35,8 +35,8 @@ license {
 }
 
 repositories {
+    mavenCentral()
     maven { url = "https://maven.fabricmc.net/" }
-    maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
 dependencies {
@@ -49,8 +49,8 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.37.0+1.17"
 
     // Colonel
-    modImplementation "ca.stellardrift:colonel:0.2.1-SNAPSHOT"
-    include "ca.stellardrift:colonel:0.2.1-SNAPSHOT"
+    modImplementation "ca.stellardrift:colonel:0.2.1"
+    include "ca.stellardrift:colonel:0.2.1"
 }
 
 processResources {

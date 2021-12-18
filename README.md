@@ -34,13 +34,16 @@ Latest version: ![GitHub release (latest SemVer)](https://img.shields.io/github/
 
 ```
 repositories {
+    mavenCentral()
     maven { url = "https://api.modrinth.com/maven" }
 }
 ```
 
 ```
 dependencies {
-    // Aegis
+    // Aegis + Colonel
+    modImplementation "ca.stellardrift:colonel:0.2.1"
+    include "ca.stellardrift:colonel:0.2.1"
     modImplementation "maven.modrinth:aegis:<VERSION>"
     include "maven.modrinth:aegis:<VERSION>"
 }
